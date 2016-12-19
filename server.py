@@ -48,6 +48,7 @@ class BoxesServer(PodSixNet.Server.Server):
 
     def placeing(self, x, y, data, gameid, playerke):
         game = [a for a in self.games if a.gameid == gameid]
+        print len(game)
         if len(game) == 1:
             game[0].placeing(x, y, data, gameid,playerke)
 
@@ -83,12 +84,20 @@ class gamenya:
             # self.player1.Send(data)
 
     def placeing(self, x, y, data, gameid,playerke):
+        print "playerke",playerke
+        print "giliransapa",self.turn
         # make sure it's their turn
         if playerke == self.turn:
-            self.turn = 0 if self.turn else 1
+            self.turn = 1 if self.turn else 0
             self.player0.Send({"action": "place","horisontal": x, "vertical": y, "gameid":self.gameid,"playerke":playerke,"torf": True if self.turn == 1 else False})
             print "Send to",self.player0
             self.player1.Send({"action": "place","horisontal": x, "vertical": y, "gameid":self.gameid,"playerke":playerke,"torf": True if self.turn == 0 else False})
+            print "send to",self.player1
+        else:
+            self.turn = 1 if self.turn else 0
+            self.player0.Send({"action": "place","horisontal": x, "vertical": y, "gameid":self.gameid,"playerke":playerke,"torf": True if self.turn == 0 else False})
+            print "Send to",self.player0
+            self.player1.Send({"action": "place","horisontal": x, "vertical": y, "gameid":self.gameid,"playerke":playerke,"torf": True if self.turn == 1 else False})
             print "send to",self.player1
             # self.player0.Send(data)
             # self.player1.Send(data)
