@@ -409,7 +409,28 @@ class Game():
 				print "wida"
 			n1=n1+1
 				
-
+	def check_clientdua(self):
+		flag = [[0 for xrange in range(500)]for yrange in range(500)]
+		h2=30
+		v2=20
+		m2=0
+		n2=0
+		nilaih2=0
+		nilaiv2=0
+		while(m2<5):
+			if(flag[v2][h2+100]==1):
+				nilaih2=nilaih2+1
+			if(nilaih2==4):
+				self.win()
+				print "wida"
+			m2=m2+1
+		while(n2<5):
+			if(flag[v2+100][h2]==1):
+				nilaiv2=nilaiv2+1
+			if(nilaiv2==4):
+				self.win()
+				print "wida"
+			n2=n2+1
 		
  #	def opening(self) :
 #		myfont = pygame.font.SysFont("Arial",80)
