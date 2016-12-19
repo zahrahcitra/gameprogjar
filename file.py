@@ -431,6 +431,10 @@ class Game():
 				self.win()
 				print "wida"
 			n2=n2+1
+	def win(self):
+		self.gambarwin = pygame.image.load("win.png").convert_alpha()
+		self.screen.blit(self.gambarwin,(250,250))
+		pygame.display.flip()
 		
  #	def opening(self) :
 #		myfont = pygame.font.SysFont("Arial",80)
