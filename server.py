@@ -114,6 +114,21 @@ class gamenya:
             # self.player0.Send(data)
             # self.player1.Send(data)
     # def sending(self,x,y,player):
+    
+    def statuswin(self,statuswin,playerke):
+        if playerke == self.turn:
+            self.turn = 1 if self.turn else 0
+            self.player0.Send({"action": "win","gameid": self.gameid, "playerke": playerke,"torf": True if self.turn == 0 else False,"statusturn": False})
+            print "Send to", self.player0
+            self.player1.Send({"action": "win","gameid": self.gameid, "playerke": playerke, "torf": True if self.turn == 1 else False,"statusturn": False})
+            print "send to", self.player1
+        else:
+            self.turn = 1 if self.turn else 0
+            self.player0.Send({"action": "win","gameid": self.gameid, "playerke": playerke,"torf": True if self.turn == 1 else False,"statusturn": False})
+            print "Send to", self.player0
+            self.player1.Send({"action": "win","gameid": self.gameid, "playerke": playerke, "torf": True if self.turn == 0 else False,"statusturn": False})
+            print "send to", self.player1
+
 
 host, port = "10.151.62.84", 6969
 boxesServe = BoxesServer(localaddr=(host, int(port)))
