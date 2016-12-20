@@ -84,13 +84,24 @@ class Game(ConnectionListener):
             thread.start()
 
     def win(self):
-        self.gambarwin = pygame.image.load("charizard.png").convert_alpha()
-        myfont = pygame.font.SysFont(None, 40)
+        self.gambarwin = pygame.image.load("win.png").convert_alpha()
+        #myfont = pygame.font.SysFont(None, 40)
         self.screen.fill((255, 204, 153))
-        label = myfont.render("You WIN", 1, (255, 255, 255))
+        #label = myfont.render("You WIN", 1, (255, 255, 255))
         self.screen.blit(self.gambarwin, (245, 250))
-        self.screen.blit(label, (10, 225))
+        #self.screen.blit(label, (10, 225))
         pygame.display.flip()
+		
+		
+	def lose(self):
+        self.gambarlose = pygame.image.load("lose.png").convert_alpha()
+        #myfont = pygame.font.SysFont(None, 40)
+        self.screen.fill((255, 204, 153))
+        #label = myfont.render("You Lose", 1, (255, 255, 255))
+        self.screen.blit(self.gambarlose, (245, 250))
+        #self.screen.blit(label, (10, 225))
+        pygame.display.flip()
+
 
 
     def pickgambar(self):
@@ -265,4 +276,3 @@ while True:
     pygame.display.flip()
     game.pickgambar()
     connection.Pump()
-
