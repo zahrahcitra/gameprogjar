@@ -11,13 +11,14 @@ class Game(ConnectionListener):
         # inialisasi untuk status permainan (koordinasi dengan server)
         self.flag = [[0 for xrange in range(500)] for yrange in range(500)]
         self.inisialisasi()
+        self.statuswin = None
         self.num = None
         self.running = False
         self.statusturn = None
-        self.movement = [[0 for a in range(5)] for b in range(5)]
+        self.movement = [[0 for a in range(100)] for b in range(100)]
         print self.movement[0][0]
         # self.screen.fill((190,190,190))
-        host, port = "localhost", 6969
+        host, port = "10.151.62.84", 6969
         print "Connect to: ", host, ":", port
         self.Connect((host, int(port)))
         self.gameid = None
@@ -35,8 +36,8 @@ class Game(ConnectionListener):
             self.Pump()
             sleep(0.01)
 
-    def Network(self, data):
-        print data
+    # def Network(self, data):
+    #     print data
 
     def Network_startgame(self, data):
         self.running = True
@@ -50,13 +51,20 @@ class Game(ConnectionListener):
     # else:
     # 	self.statusturn = False
 
+    def Network_win(self,data):
+        self.statuswin = data["torf"]
+        self.gameid = data["gameid"]
+        self.statusturn = data["statusturn"]
+        print "Status menang",self.statuswin
+        print "Status Turndari win",self.statusturn
+
     def Network_place(self, data):
         x = data["horisontal"]
         y = data["vertical"]
         playerke = data["playerke"]
         self.gameid = data["gameid"]
         self.statusturn = data["torf"]
-        print 3
+        print "Receive From Server"
         if playerke == 1 and self.flag[x][y] == 0:
             self.cowok(x, y, playerke, self.gameid)
         elif playerke == 0 and self.flag[x][y] == 0:
@@ -76,6 +84,7 @@ class Game(ConnectionListener):
         if (temp == client):
             thread = Thread(target=self.win())
             thread.start()
+
         temp = client
         for i in range(5):
             temp = temp & self.movement[x][i]
@@ -84,25 +93,25 @@ class Game(ConnectionListener):
             thread.start()
 
     def win(self):
-        self.gambarwin = pygame.image.load("win.png").convert_alpha()
-        #myfont = pygame.font.SysFont(None, 40)
+        self.gambarwin = pygame.image.load("charizard.png").convert_alpha()
+        self.gambarmenang = pygame.image.load("menang.png").convert_alpha()
+        myfont = pygame.font.SysFont(None, 40)
         self.screen.fill((255, 204, 153))
-        #label = myfont.render("You WIN", 1, (255, 255, 255))
+        label = myfont.render("You WIN", 1, (255, 255, 255))
         self.screen.blit(self.gambarwin, (245, 250))
-        #self.screen.blit(label, (10, 225))
+        self.screen.blit(label, (10, 225))
+        self.screen.blit(self.gambarmenang ,(100,345))
         pygame.display.flip()
-		
-		
-	def lose(self):
-        self.gambarlose = pygame.image.load("lose.png").convert_alpha()
-        #myfont = pygame.font.SysFont(None, 40)
+        self.Send({"action": "win","statuswin":True,"playerke":self.playerke,"gameid":self.gameid})
+
+    def lose(self):
+        self.gambarlose = pygame.image.load("gengar.png").convert_alpha()
+        myfont = pygame.font.SysFont(None, 40)
         self.screen.fill((255, 204, 153))
-        #label = myfont.render("You Lose", 1, (255, 255, 255))
+        label = myfont.render("You Lose", 1, (255, 255, 255))
         self.screen.blit(self.gambarlose, (245, 250))
-        #self.screen.blit(label, (10, 225))
+        self.screen.blit(label, (10, 225))
         pygame.display.flip()
-
-
 
     def pickgambar(self):
         # print 5
@@ -143,7 +152,8 @@ class Game(ConnectionListener):
                                 posYdraw = j * 100 + 20
                                 if self.flag[posXdraw][posYdraw] == 0:
                                     self.cewek(posXdraw, posYdraw,1,self.gameid)
-                                    self.movement[i][j] = 1
+                                    print "Drawing Cewek"
+                                self.movement[i][j] = 1
                                 self.calcScore(i, j, 1)
                 elif pygame.key.get_pressed()[pygame.K_SPACE]:
                     print "spasi nih sob"
@@ -198,8 +208,9 @@ class Game(ConnectionListener):
                                 if self.flag[posXdraw][posYdraw] == 0:
                                     self.cowok(posXdraw, posYdraw, 0, self.gameid)
                                     self.flag[posXdraw][posYdraw] = 1
-                                    self.movement[i][j] = 2
-                                    self.calcScore(i, j, 2)
+                                    print "Drawing Cowok"
+                                self.movement[i][j] = 2
+                                self.calcScore(i, j, 2)
                 elif pygame.key.get_pressed()[pygame.K_SPACE]:
                     print "spasi nih sob"
 
@@ -221,30 +232,32 @@ class Game(ConnectionListener):
         pygame.display.flip()  # reload screen display
 
     def cewek(self, horisontal, vertical, playerke, gameid):
-        print self.statusturn
-        self.gambargirl = pygame.image.load("girl.png").convert_alpha()
-        self.screen.blit(self.gambargirl, (horisontal, vertical))
-        self.flag[horisontal][vertical] = 1
-        # self.statusturn = False
-        if playerke == 1:
-            self.Send({"action": "place", "horisontal": horisontal, "vertical": vertical, "gameid": self.gameid,
-                       "playerke": self.playerke})
-            print "Sending To server"
-            self.statusturn = False
-        pygame.display.flip()
+        if self.statuswin == None:
+            print "Status Giliran",self.statusturn
+            self.gambargirl = pygame.image.load("girl.png").convert_alpha()
+            self.screen.blit(self.gambargirl, (horisontal, vertical))
+            self.flag[horisontal][vertical] = 1
+            # self.statusturn = False
+            if playerke == 1:
+                self.Send({"action": "place", "horisontal": horisontal, "vertical": vertical, "gameid": self.gameid,
+                           "playerke": self.playerke})
+                print "Sending To server"
+                self.statusturn = False
+            pygame.display.flip()
 
     def cowok(self, horisontal, vertical, playerke, gameid):
-        print self.statusturn
-        self.gambarboy = pygame.image.load("boy.png").convert_alpha()
-        self.screen.blit(self.gambarboy, (horisontal, vertical))
-        self.flag[horisontal][vertical] = 1
-        # self.statusturn = False
-        if playerke == 0:
-            self.Send({"action": "place", "horisontal": horisontal, "vertical": vertical, "gameid": self.gameid,
-                       "playerke": self.playerke})
-            print "Sending To server"
-            self.statusturn = False
-        pygame.display.flip()
+        if self.statuswin == None:
+            print self.statusturn
+            self.gambarboy = pygame.image.load("boy.png").convert_alpha()
+            self.screen.blit(self.gambarboy, (horisontal, vertical))
+            self.flag[horisontal][vertical] = 1
+            # self.statusturn = False
+            if playerke == 0:
+                self.Send({"action": "place", "horisontal": horisontal, "vertical": vertical, "gameid": self.gameid,
+                           "playerke": self.playerke})
+                print "Sending To server"
+                self.statusturn = False
+            pygame.display.flip()
 
     def inisialisasi(self):
         flag = [[0 for xrange in range(500)] for yrange in range(500)]
@@ -269,10 +282,13 @@ game.wida()
 # game.pickgambar()
 
 while True:
-    # if self.menang:
-    #     break
-    # game.wida()
-    # game.wida()
-    pygame.display.flip()
-    game.pickgambar()
     connection.Pump()
+    pygame.display.flip()
+    if game.statuswin == None:
+        game.pickgambar()
+    elif game.statuswin == True:
+        game.win()
+        pygame.display.flip()
+    elif game.statuswin == False:
+        game.lose()
+        pygame.display.flip()
