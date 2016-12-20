@@ -18,6 +18,12 @@ class ClientChannel(PodSixNet.Channel.Channel):
         # self._server.gantiTurn(self.gameid,playerke)
         # self._server.gantiTurn(x,y,data,self.gameid,playerke)
 
+    def Network_win(self,data):
+        playerke = data["playerke"]
+        self.statuswin = data["statuswin"]
+        self.gameid = data["gameid"]
+        self._server.win(self.statuswin,playerke,self.gameid)
+
 
 class BoxesServer(PodSixNet.Server.Server):
     channelClass = ClientChannel
@@ -53,6 +59,7 @@ class BoxesServer(PodSixNet.Server.Server):
             game[0].placeing(x, y, data, gameid,playerke)
 
 
+
     # def gantiTurn(self,gameid, playerke):
     #     game = [a for a in self.games if a.gameid == gameid]
     #     print len(game)
@@ -64,6 +71,11 @@ class BoxesServer(PodSixNet.Server.Server):
         # # self.send({"action":"player", "playerke": self.playerke})
         # self.playerke+=1
 
+    def win(self,statuswin,playerke,gameid):
+        game = [a for a in self.games if a.gameid == gameid]
+        print "cekcek"
+        if len(game) == 1:
+            game[0].statuswin(statuswin,playerke)
 
 class gamenya:
     def __init__(self,player0, currentIndex):
@@ -103,9 +115,7 @@ class gamenya:
             # self.player1.Send(data)
     # def sending(self,x,y,player):
 
-
-
-host, port = "localhost", 6969
+host, port = "10.151.62.84", 6969
 boxesServe = BoxesServer(localaddr=(host, int(port)))
 if (boxesServe):
     print "Server on: ", host, ":", port
